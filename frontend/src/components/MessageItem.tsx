@@ -17,6 +17,7 @@ export default function MessageItem({ message, onMessageUpdated, onMessageDelete
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(message.content);
+  const [originalContent, setOriginalContent] = useState(message.content);
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,6 +40,9 @@ export default function MessageItem({ message, onMessageUpdated, onMessageDelete
       return `${diffDay}d atrás`;
     }
   };
+
+  const hasChanges = editContent !== originalContent;
+  const isSaveDisabled = !hasChanges || !editContent.trim();
 
   const handleSaveEdit = async () => {
     if (!editContent.trim()) {
@@ -65,9 +69,15 @@ export default function MessageItem({ message, onMessageUpdated, onMessageDelete
   };
 
   const handleCancelEdit = () => {
-    setEditContent(message.content);
+    setEditContent(originalContent);
     setIsEditing(false);
     setError(null);
+  };
+
+  const startEditing = () => {
+    setOriginalContent(message.content);
+    setEditContent(message.content);
+    setIsEditing(true);
   };
 
   const handleDelete = async () => {
@@ -131,7 +141,7 @@ export default function MessageItem({ message, onMessageUpdated, onMessageDelete
           {!isEditing && (
             <>
               <button
-                onClick={() => setIsEditing(true)}
+                onClick={startEditing}
                 disabled={deleting}
                 className="p-2 rounded-md text-text-secondary hover:text-button-primary transition-colors disabled:opacity-50 cursor-pointer"
                 aria-label="Editar mensagem"
@@ -180,14 +190,18 @@ export default function MessageItem({ message, onMessageUpdated, onMessageDelete
               <button
                 onClick={handleCancelEdit}
                 disabled={loading}
-                className="px-4 py-2 text-text-secondary hover:text-text-primary border border-border-input rounded-md hover:bg-bg-primary transition-colors disabled:opacity-50"
+                className="px-4 py-2 cursor-pointer text-text-secondary hover:text-text-primary border border-border-input rounded-md hover:bg-bg-primary transition-colors disabled:opacity-50"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleSaveEdit}
-                disabled={loading || !editContent.trim()}
-                className="px-4 py-2 bg-button-primary text-white rounded-md hover:bg-button-primary-hover focus:outline-none focus:ring-2 focus:ring-button-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                disabled={isSaveDisabled || loading}
+                className={`px-4 py-2 rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center gap-2 transition-colors ${
+                  isSaveDisabled
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-button-primary text-white hover:bg-button-primary-hover focus:ring-button-primary'
+                }`}
               >
                 {loading && (
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>

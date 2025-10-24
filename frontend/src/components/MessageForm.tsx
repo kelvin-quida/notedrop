@@ -76,7 +76,7 @@ export default function MessageForm({ onMessageCreated }: MessageFormProps) {
   };
 
   return (
-    <div className="rounded-xl p-6 glass-card">
+    <div>
       <h2 className="text-lg font-semibold text-text-secondary mb-3">
         Enviar Nova Mensagem
       </h2>

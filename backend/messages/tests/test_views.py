@@ -114,3 +114,73 @@ class MessageAPITest(TestCase):
         self.assertIn('created_at', message)
         self.assertIn('updated_at', message)
         self.assertEqual(len(message.keys()), 4)
+        
+    def test_delete_all_messages(self):
+        self.assertEqual(Message.objects.count(), 2)
+        
+        response = self.client.delete(self.list_url)
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['message'], '2 mensagens foram apagadas com sucesso')
+        
+        self.assertEqual(Message.objects.count(), 0)
+        
+        response = self.client.delete(self.list_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['message'], '0 mensagens foram apagadas com sucesso')
+        
+    def test_update_message(self):
+        message = Message.objects.create(content="Original content")
+        update_url = reverse('message-update', kwargs={'pk': message.id})
+        
+        update_data = {'content': 'Updated content'}
+        response = self.client.patch(
+            update_url,
+            data=json.dumps(update_data),
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['content'], 'Updated content')
+        
+        message.refresh_from_db()
+        self.assertEqual(message.content, 'Updated content')
+        
+    def test_delete_single_message(self):
+        message = Message.objects.create(content="Message to delete")
+        delete_url = reverse('message-delete', kwargs={'pk': message.id})
+        
+        response = self.client.delete(delete_url)
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['message'], f'Mensagem #{message.id} foi apagada com sucesso')
+        
+        with self.assertRaises(Message.DoesNotExist):
+            Message.objects.get(id=message.id)
+            
+    def test_update_nonexistent_message(self):
+        update_url = reverse('message-update', kwargs={'pk': 9999})
+        response = self.client.patch(
+            update_url,
+            data=json.dumps({'content': 'New content'}),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        
+    def test_update_message_invalid_data(self):
+        message = Message.objects.create(content="Original content")
+        update_url = reverse('message-update', kwargs={'pk': message.id})
+        
+        response = self.client.patch(
+            update_url,
+            data=json.dumps({'content': ''}),
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('content', response.data)
+        
+    def test_delete_nonexistent_message(self):
+        delete_url = reverse('message-delete', kwargs={'pk': 9999})
+        response = self.client.delete(delete_url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
