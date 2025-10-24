@@ -75,7 +75,7 @@ html, body, #root {
 }
 
 .app-shell {
-  @apply min-h-screen bg-gradient-to-b from-bg-primary to-bg-tertiary;
+  @apply min-h-screen bg-linear-to-b from-bg-primary to-bg-tertiary;
 }
 
 .glass-card {

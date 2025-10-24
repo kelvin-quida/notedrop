@@ -16,7 +16,7 @@ Aplicação web para envio e gerenciamento de mensagens curtas, com backend em D
 
 1. **Clone o repositório**
    ```bash
-   git clone <url-do-repositorio>
+   git clone https://github.com/kelvin-quida/notedrop
    cd notedrop
    ```
 
