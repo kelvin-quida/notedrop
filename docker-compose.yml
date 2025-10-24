@@ -63,7 +63,6 @@ services:
     volumes:
       - ./e2e:/e2e
       - /e2e/node_modules
-    # Não inicia automaticamente, apenas quando executado manualmente
     profiles:
       - testing
     command: npm test
