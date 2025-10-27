@@ -25,7 +25,7 @@ class MessageListCreateView(generics.ListCreateAPIView):
                     cursor.execute(sql)
 
         return Response(
-            {'message': f'{count} mensagens foram apagadas com sucesso.'},
+            {'message': f'{count} mensagens foram apagadas com sucesso'},
             status=status.HTTP_200_OK
         )
 
@@ -42,7 +42,7 @@ class MessageDeleteView(generics.DestroyAPIView):
         message_id = instance.id
         instance.delete()
         return Response(
-            {'message': f'Mensagem #{message_id} foi apagada com sucesso.'},
+            {'message': f'Mensagem #{message_id} foi apagada com sucesso'},
             status=status.HTTP_200_OK
         )
 
